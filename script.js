@@ -4,16 +4,19 @@ const cashGroup = document.querySelector("#cash-group");
 const checkBtn = document.querySelector("#check-btn");
 const payBtn = document.querySelector("#pay-btn");
 const table = document.querySelector("table");
+const billErr = document.querySelector("#bill-err");
+const cashErr = document.querySelector("#cash-err");
+const output = document.querySelector("#output");
 
 const notes = [
-  { note: 500, number: 1 },
-  { note: 200, number: 2 },
-  { note: 100, number: 1 },
-  { note: 50, number: 3 },
-  { note: 20, number: 5 },
-  { note: 10, number: 0 },
-  { note: 5, number: 2 },
-  { note: 1, number: 1 },
+  { note: 500, number: null },
+  { note: 200, number: null },
+  { note: 100, number: null },
+  { note: 50, number: null },
+  { note: 20, number: null },
+  { note: 10, number: null },
+  { note: 5, number: null },
+  { note: 1, number: null },
 ];
 
 checkBtn.addEventListener("click", () => {
@@ -22,8 +25,9 @@ checkBtn.addEventListener("click", () => {
     isNaN(billInput.value) ||
     billInput.value <= 0
   ) {
-    console.log("enter valid amount");
+    billErr.innerHTML = "Enter valid non-zero amount number";
   } else {
+    billErr.innerHTML = "";
     cashGroup.classList.add("open");
     cashInput.focus();
   }
@@ -31,24 +35,38 @@ checkBtn.addEventListener("click", () => {
 
 payBtn.addEventListener("click", () => {
   if (cashInput.value === "" || isNaN(cashInput.value)) {
-    console.log("enter amount");
+    cashErr.innerHTML = "Enter valid non-zero amount number";
+    table.style.visibility = "hidden";
+    output.innerHTML = ``;
   } else {
     const retrunValue = cashInput.value - billInput.value;
     if (retrunValue > 0) {
-      console.log(`Return cash is ${retrunValue}`);
+      output.innerHTML = `Cash to be returned is ${retrunValue}`;
+      cashErr.innerHTML = "";
       table.style.visibility = "visible";
+      fillTable(notes);
       createTable(notes);
     } else if (retrunValue === 0) {
-      console.log(`No cash to be returned`);
+      output.innerHTML = `No cash to be returned`;
+      table.style.visibility = "hidden";
     } else {
-      alert(`cash value should be more than or equal to bill amount`);
+      table.style.visibility = "hidden";
+      output.innerHTML = ``;
+      cashErr.innerHTML = `cash value should be more than or equal to bill amount`;
     }
   }
 });
 
-window.addEventListener("load", () => {
-  billInput.focus();
-});
+const fillTable = (data) => {
+  let diff = cashInput.value - billInput.value;
+  for (let i = 0; i < data.length; i++) {
+    data[i].number = Math.floor(diff / data[i].note);
+    diff = diff - data[i].number * data[i].note;
+    if (data[i].number === 0) {
+      data[i].number = null;
+    }
+  }
+};
 
 const createTable = (data) => {
   //   console.log(data);
@@ -58,12 +76,21 @@ const createTable = (data) => {
             (d, i) => `
             <tr>
                 <td>${d.note}</td>
-                <td>${d.number}</td>
+                <td>${d.number !== null ? d.number : " "}</td>
             </tr>
             `
           )
           .join(" ")}
     `;
   //   console.log(tableRow);
-  table.innerHTML += tableRow;
+  const tableHeader = `<tr>
+      <th>Notes</th>
+      <th>No. of Notes</th> 
+    </tr>`;
+
+  table.innerHTML = tableHeader + tableRow;
 };
+
+window.addEventListener("load", () => {
+  billInput.focus();
+});
