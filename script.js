@@ -19,7 +19,8 @@ const notes = [
   { note: 1, number: null },
 ];
 
-checkBtn.addEventListener("click", () => {
+checkBtn.addEventListener("click", (e) => {
+  e.preventDefault();
   if (
     billInput.value === "" ||
     isNaN(billInput.value) ||
@@ -33,7 +34,8 @@ checkBtn.addEventListener("click", () => {
   }
 });
 
-payBtn.addEventListener("click", () => {
+payBtn.addEventListener("click", (e) => {
+  e.preventDefault();
   if (cashInput.value === "" || isNaN(cashInput.value)) {
     cashErr.innerHTML = "Enter valid non-zero amount number";
     table.style.visibility = "hidden";
